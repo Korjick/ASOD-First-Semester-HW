@@ -64,7 +64,7 @@ public class KaratsubaMultiplyer {
                 + booleanArrToInt(p2);
     }
 
-    public static boolean[] booleansArrMultiply(boolean[] a, boolean[] b) {
+    private static boolean[] booleansArrMultiply(boolean[] a, boolean[] b) {
         ArrayList<Integer> arr = new ArrayList<>(2 * n);
         for (int i = 0; i < 2 * n; i++) arr.add(0);
 
@@ -110,11 +110,11 @@ public class KaratsubaMultiplyer {
         return result;
     }
 
-    public static boolean[] booleanArrSum(boolean[] a, boolean[] b) {
+    private static boolean[] booleanArrSum(boolean[] a, boolean[] b) {
         return intToBooleanArr(booleanArrToInt(a) + booleanArrToInt(b));
     }
 
-    public static int booleanArrToInt(boolean[] a) {
+    private static int booleanArrToInt(boolean[] a) {
         int sum = 0, k = 0;
         for (int i = a.length - 1; i >= 0; i--) {
             if (a[i]) sum = sum + (int) Math.pow(2, k);
