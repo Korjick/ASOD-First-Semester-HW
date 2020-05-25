@@ -1,6 +1,7 @@
 package Karatsuba;
 
 import Queue.Queue;
+import sun.security.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,24 +18,10 @@ public class KaratsubaMultiplyer {
     private static int n;
 
     public static int multiply(int a, int b) {
+        n = Math.max(Integer.toBinaryString(a).length(), Integer.toBinaryString(b).length());
 
-        String aBinary = Integer.toBinaryString(a), bBinary = Integer.toBinaryString(b);
-        n = Math.max(aBinary.length(), bBinary.length());
-
-        x = new boolean[n];
-        y = new boolean[n];
-
-        int k = 0;
-        for (int i = aBinary.length() - 1; i >= 0; i--) {
-            x[x.length - 1 - k] = aBinary.charAt(i) == '1';
-            k++;
-        }
-
-        k = 0;
-        for (int i = bBinary.length() - 1; i >= 0; i--) {
-            y[y.length - 1 - k] = bBinary.charAt(i) == '1';
-            k++;
-        }
+        x = intToBooleanArr(a, n);
+        y = intToBooleanArr(b, n);
 
         return inner_multiply();
     }
@@ -65,73 +52,50 @@ public class KaratsubaMultiplyer {
     }
 
     private static boolean[] booleansArrMultiply(boolean[] a, boolean[] b) {
-        ArrayList<Integer> arr = new ArrayList<>(2 * n);
-        for (int i = 0; i < 2 * n; i++) arr.add(0);
+        int res = 0;
 
         if (a.length < b.length) {
             for (int i = a.length - 1; i >= 0; i--) {
                 boolean[] test = new boolean[b.length];
-                int k = arr.size() - 1 - (a.length - 1 - i);
+                int k = (a.length - 1 - i);
                 System.arraycopy(b, 0, test, 0, b.length);
 
                 for (int j = 0; j < test.length; j++) test[j] = test[j] & a[i];
-                for (int j = test.length - 1; j >= 0; j--) {
-                    if(test[j]) arr.set(k, arr.get(k) + 1);
-                    k--;
-                }
+                res |= booleanArrToInt(test) << k;
             }
         } else {
             for (int i = b.length - 1; i >= 0; i--) {
                 boolean[] test = new boolean[a.length];
-                int k = arr.size() - 1 - (b.length - 1 - i);
+                int k = (b.length - 1 - i);
                 System.arraycopy(a, 0, test, 0, a.length);
 
                 for (int j = 0; j < test.length; j++) test[j] = test[j] & b[i];
-                for (int j = test.length - 1; j >= 0; j--) {
-                    if(test[j]) arr.set(k, arr.get(k) + 1);
-                    k--;
-                }
+                res |= booleanArrToInt(test) << k;
             }
         }
 
-        for (int i = arr.size() - 1; i > 0; i--) {
-            if(arr.get(i) > 1){
-                int k = arr.get(i);
-                arr.set(i, k % 2);
-                arr.set(i - 1, arr.get(i - 1) + (k / 2));
-            }
-        }
-
-        int idx = arr.indexOf(1);
-        boolean[] result = new boolean[arr.size() - idx];
-        for (int i = idx; i < arr.size(); i++) {
-            result[i - idx] = arr.get(i) == 1;
-        }
-        return result;
+        return intToBooleanArr(res, Integer.toBinaryString(res).length());
     }
 
     private static boolean[] booleanArrSum(boolean[] a, boolean[] b) {
-        return intToBooleanArr(booleanArrToInt(a) + booleanArrToInt(b));
+        int res = booleanArrToInt(a) + booleanArrToInt(b);
+        return intToBooleanArr(res, Integer.toBinaryString(res).length());
     }
 
     private static int booleanArrToInt(boolean[] a) {
-        int sum = 0, k = 0;
-        for (int i = a.length - 1; i >= 0; i--) {
-            if (a[i]) sum = sum + (int) Math.pow(2, k);
-            k++;
+        int sum = 0;
+        for (boolean b : a) {
+            sum = (sum << 1) + (b ? 1 : 0);
         }
+
         return sum;
     }
 
-    private static boolean[] intToBooleanArr(int a){
-        String aBinary = Integer.toBinaryString(a);
+    private static boolean[] intToBooleanArr(int a, int size){
+        boolean[] res = new boolean[size];
 
-        boolean[] res = new boolean[aBinary.length()];
-
-        int k = 0;
-        for (int i = aBinary.length() - 1; i >= 0; i--) {
-            res[res.length - 1 - k] = aBinary.charAt(i) == '1';
-            k++;
+        for (int i = res.length - 1; i >= 0; i--) {
+            res[res.length - 1 - i] = (a & (1 << i)) != 0;
         }
 
         return res;
