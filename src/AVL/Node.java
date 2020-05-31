@@ -37,8 +37,4 @@ public class Node {
     public void setHeight(int height) {
         this.height = height;
     }
-
-    public void setKey(int key) {
-        this.key = key;
-    }
 }
